@@ -640,6 +640,7 @@ CreateButton(MainTab, "Enable Speed Hack", function()
 end)
 
 CreateToggle(MainTab, "aimbot", function(state)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G/refs/heads/main/LOAD/Assets/Aimbot.lua"))()
 end)
 
 CreateSlider(PlayerTab, "fov", 50, 150, function(value)
