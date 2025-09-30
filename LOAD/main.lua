@@ -628,6 +628,17 @@ KeyCopy.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Создаем вкладки
+local MainTab = CreateTab("Main")
+local PlayerTab = CreateTab("Misc")
+local PremTab = CreateTab("Premium")
+local SettingsTab = CreateTab("Settings")
+
+-- Добавляем элементы в MainTab
+CreateButton(MainTab, "Enable Speed Hack", function()
+    print("Speed Hack Enabled!")
+end)
+
 -- Утилиты
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -650,7 +661,7 @@ Circle.Filled = false
 local function GetClosestPlayer()
     local ClosestPlayer = nil
     local ClosestDistance = math.huge
-    local MousePos = UserInputService:GetMouseLocation()
+    local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 
     for _, Player in pairs(Players:GetPlayers()) do
         if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("Head") then
@@ -658,7 +669,7 @@ local function GetClosestPlayer()
             local HeadPos, OnScreen = Camera:WorldToViewportPoint(Head.Position)
             
             if OnScreen then
-                local Distance = (Vector2.new(HeadPos.X, HeadPos.Y) - Vector2.new(MousePos.X, MousePos.Y)).Magnitude
+                local Distance = (Vector2.new(HeadPos.X, HeadPos.Y) - ScreenCenter).Magnitude
                 if Distance <= FOV and Distance < ClosestDistance then
                     ClosestDistance = Distance
                     ClosestPlayer = Player
@@ -673,35 +684,38 @@ end
 local function AimAt(target)
     if target and target.Character and target.Character:FindFirstChild("Head") then
         local HeadPos = Camera:WorldToViewportPoint(target.Character.Head.Position)
-        mousemoverel((HeadPos.X - UserInputService:GetMouseLocation().X), (HeadPos.Y - UserInputService:GetMouseLocation().Y))
+        local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+        mousemoverel((HeadPos.X - ScreenCenter.X), (HeadPos.Y - ScreenCenter.Y))
     end
 end
 
 -- Обновление FOV-кружка
 local function UpdateCircle()
     Circle.Radius = FOV
-    Circle.Position = UserInputService:GetMouseLocation()
+    Circle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2) -- Центр экрана
     Circle.Visible = AimbotEnabled
 end
 
--- Создаем вкладки
-local MainTab = CreateTab("Main")
-local PlayerTab = CreateTab("Misc")
-local PremTab = CreateTab("Premium")
-local SettingsTab = CreateTab("Settings")
-
--- Добавляем элементы в MainTab
-CreateButton(MainTab, "Enable Speed Hack", function()
-    print("Speed Hack Enabled!")
-end)
-
+-- Тоггл аимбота
 CreateToggle(MainTab, "aimbot", function(state)
-        AimbotEnabled = state
+    AimbotEnabled = state
     Circle.Visible = state
 end)
 
+-- Слайдер для FOV
 CreateSlider(PlayerTab, "fov", 50, 150, function(value)
-        FOV = value
+    FOV = value
+end)
+
+-- Основной цикл аимбота
+RunService.RenderStepped:Connect(function()
+    UpdateCircle()
+    if AimbotEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        local Target = GetClosestPlayer()
+        if Target then
+            AimAt(Target)
+        end
+    end
 end)
 
 -- Добавляем элементы в SettingsTab
