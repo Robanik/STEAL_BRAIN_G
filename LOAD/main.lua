@@ -639,33 +639,10 @@ CreateButton(MainTab, "Enable Speed Hack", function()
     print("Speed Hack Enabled!")
 end)
 
-CreateToggle(MainTab, "Infinite Jump", function(state)
-local function InfiniteJump()
-    local Players = game:GetService("Players")
-    local plr = Players.LocalPlayer
-    local UserInputService = game:GetService("UserInputService")
-
-    UserInputService.JumpRequest:Connect(function()
-        local character = plr.Character
-        if character then
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end
-    end)
-end
-
--- Вызов функции
-InfiniteJump()
+CreateToggle(MainTab, "aimbot", function(state)
 end)
 
-CreateSlider(PlayerTab, "Walk Speed", 16, 100, function(value)
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-end)
-
-CreateTextBox(PlayerTab, "Custom Value", function(text)
-    print("haha")
+CreateSlider(PlayerTab, "fov", 50, 150, function(value)
 end)
 
 -- Добавляем элементы в SettingsTab
