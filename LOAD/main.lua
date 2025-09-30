@@ -680,20 +680,33 @@ local function GetClosestPlayer()
     return ClosestPlayer
 end
 
--- Функция аимбота
-local function AimAt(target)
+-- Функция аимбота (через mousemoverel)
+local function AimAtMouse(target)
     if target and target.Character and target.Character:FindFirstChild("Head") then
         local HeadPos = Camera:WorldToViewportPoint(target.Character.Head.Position)
         local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-        mousemoverel((HeadPos.X - ScreenCenter.X), (HeadPos.Y - ScreenCenter.Y))
+        local DeltaX = HeadPos.X - ScreenCenter.X
+        local DeltaY = HeadPos.Y - ScreenCenter.Y
+        print("Attempting mousemoverel:", DeltaX, DeltaY) -- Отладка
+        mousemoverel(DeltaX, DeltaY)
+    end
+end
+
+-- Альтернативная функция аимбота (через управление камерой)
+local function AimAtCamera(target)
+    if target and target.Character and target.Character:FindFirstChild("Head") then
+        local HeadPos = target.Character.Head.Position
+        local CameraPos = Camera.CFrame.Position
+        local NewCFrame = CFrame.new(CameraPos, HeadPos)
+        Camera.CFrame = NewCFrame
+        print("Aiming at target via camera:", target.Name) -- Отладка
     end
 end
 
 -- Обновление FOV-кружка
 local function UpdateCircle()
-    -- Получаем точный центр экрана
     local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    Circle.Position = ScreenCenter -- Устанавливаем кружок в центр экрана
+    Circle.Position = ScreenCenter
     Circle.Radius = FOV
     Circle.Visible = AimbotEnabled
 end
@@ -702,11 +715,13 @@ end
 CreateToggle(MainTab, "aimbot", function(state)
     AimbotEnabled = state
     Circle.Visible = state
+    print("Aimbot toggled:", state) -- Отладка
 end)
 
 -- Слайдер для FOV
 CreateSlider(PlayerTab, "fov", 50, 150, function(value)
     FOV = value
+    print("FOV set to:", value) -- Отладка
 end)
 
 -- Основной цикл аимбота
@@ -715,7 +730,16 @@ RunService.RenderStepped:Connect(function()
     if AimbotEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local Target = GetClosestPlayer()
         if Target then
-            AimAt(Target)
+            print("Target found:", Target.Name) -- Отладка
+            -- Попробуем сначала mousemoverel
+            pcall(function() AimAtMouse(Target) end)
+            -- Если mousemoverel не работает, используем камеру
+            if not pcall(function() AimAtMouse(Target) end) then
+                print("mousemoverel failed, using camera aim")
+                AimAtCamera(Target)
+            end
+        else
+            print("No target found in FOV") -- Отладка
         end
     end
 end)
