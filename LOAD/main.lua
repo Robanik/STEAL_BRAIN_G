@@ -434,23 +434,18 @@ end)
 
 --=================================--
 
-CreateToggle(PlayerTab, "Infinite Jump", function(state)
-    if state then
-        UserInputService.JumpRequest:Connect(function()
-            local character = LocalPlayer.Character
-            if character then
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+CreateSlider(PlayerTab, "Walk Speed", 16, 100, function(value)
+    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Humanoid then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+        -- Запускаем автообновление внутри слайдера
+        task.spawn(function()
+            while true do
+                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Humanoid then
+                    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
                 end
+                task.wait(0.01) -- 100 мс, можно изменить
             end
         end)
-    end
-end)
-
-CreateSlider(PlayerTab, "Walk Speed", 16, 100, function(value)
-    if LocalPlayer.Character then
-        LocalPlayer.Character.Humanoid.WalkSpeed = value
     end
 end)
 
