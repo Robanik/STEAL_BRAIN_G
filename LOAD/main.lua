@@ -432,6 +432,10 @@ end)
 
 --=================================--
 
+CreateButton(EspTab, "BotEsp", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G/refs/heads/main/LOAD/Assets/Bot_Esp.lua"))()
+end)
+
 --=================================--
 
 CreateSlider(PlayerTab, "Walk Speed", 16, 100, function(value)
