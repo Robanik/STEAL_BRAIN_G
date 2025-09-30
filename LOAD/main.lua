@@ -711,6 +711,66 @@ local function UpdateCircle()
     Circle.Visible = AimbotEnabled
 end
 
+-- Утилиты
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- Переменные
+local AimbotEnabled = false
+local FOV = 50
+local Circle = Drawing.new("Circle")
+Circle.Visible = false
+Circle.Color = Color3.new(1, 0, 0) -- Красный кружок
+Circle.Thickness = 2
+Circle.NumSides = 100
+Circle.Radius = FOV
+Circle.Filled = false
+
+-- Функция получения ближайшего игрока в FOV
+local function GetClosestPlayer()
+    local ClosestPlayer = nil
+    local ClosestDistance = math.huge
+    local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+    for _, Player in pairs(Players:GetPlayers()) do
+        if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("Head") then
+            local Head = Player.Character.Head
+            local HeadPos, OnScreen = Camera:WorldToViewportPoint(Head.Position)
+            
+            if OnScreen then
+                local Distance = (Vector2.new(HeadPos.X, HeadPos.Y) - ScreenCenter).Magnitude
+                if Distance <= FOV and Distance < ClosestDistance then
+                    ClosestDistance = Distance
+                    ClosestPlayer = Player
+                end
+            end
+        end
+    end
+    return ClosestPlayer
+end
+
+-- Функция аимбота (наведение через камеру)
+local function AimAt(target)
+    if target and target.Character and target.Character:FindFirstChild("Head") then
+        local HeadPos = target.Character.Head.Position
+        local CameraPos = Camera.CFrame.Position
+        local NewCFrame = CFrame.new(CameraPos, HeadPos) -- Направляем камеру на голову игрока
+        Camera.CFrame = NewCFrame
+        print("Aiming at:", target.Name) -- Отладка
+    end
+end
+
+-- Обновление FOV-кружка
+local function UpdateCircle()
+    local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    Circle.Position = ScreenCenter
+    Circle.Radius = FOV
+    Circle.Visible = AimbotEnabled
+end
+
 -- Тоггл аимбота
 CreateToggle(MainTab, "aimbot", function(state)
     AimbotEnabled = state
@@ -730,14 +790,7 @@ RunService.RenderStepped:Connect(function()
     if AimbotEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local Target = GetClosestPlayer()
         if Target then
-            print("Target found:", Target.Name) -- Отладка
-            -- Попробуем сначала mousemoverel
-            pcall(function() AimAtMouse(Target) end)
-            -- Если mousemoverel не работает, используем камеру
-            if not pcall(function() AimAtMouse(Target) end) then
-                print("mousemoverel failed, using camera aim")
-                AimAtCamera(Target)
-            end
+            AimAt(Target)
         else
             print("No target found in FOV") -- Отладка
         end
