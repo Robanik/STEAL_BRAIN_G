@@ -542,4 +542,153 @@ local function CreateDropdown(parent, text, options, callback)
 
     DropdownButton.MouseButton1Click:Connect(function()
         DropdownList.Visible = not DropdownList.Visible
-        TweenService:Create(DropdownList, TweenInfo.n
+        TweenService:Create(DropdownList, TweenInfo.new(0.2), {Size = DropdownList.Visible and UDim2.new(0, 110, 0, #options * 30) or UDim2.new(0, 110, 0, 0)}):Play()
+    end)
+
+    return DropdownFrame
+end
+
+local function CreateColorPicker(parent, text, callback)
+    local ColorPickerFrame = Instance.new("Frame")
+    ColorPickerFrame.Size = UDim2.new(0, 200, 0, 100)
+    ColorPickerFrame.BackgroundTransparency = 1
+    ColorPickerFrame.Parent = parent
+
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(0, 80, 0, 40)
+    Label.BackgroundTransparency = 1
+    Label.Text = text
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextSize = 14
+    Label.Font = Enum.Font.Gotham
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = ColorPickerFrame
+
+    local Preview = Instance.new("Frame")
+    Preview.Size = UDim2.new(0, 30, 0, 30)
+    Preview.Position = UDim2.new(0, 160, 0, 5)
+    Preview.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Preview.Parent = ColorPickerFrame
+
+    local PreviewCorner = Instance.new("UICorner")
+    PreviewCorner.CornerRadius = UDim.new(0, 8)
+    PreviewCorner.Parent = Preview
+
+    local ColorSliderR = CreateSlider(ColorPickerFrame, "Red", 0, 255, function(value)
+        local color = Color3.fromRGB(value, ColorPickerFrame.Green or 255, ColorPickerFrame.Blue or 255)
+        Preview.BackgroundColor3 = color
+        callback(color)
+    end)
+    ColorSliderR.Position = UDim2.new(0, 0, 0, 40)
+    ColorPickerFrame.Red = 255
+
+    local ColorSliderG = CreateSlider(ColorPickerFrame, "Green", 0, 255, function(value)
+        ColorPickerFrame.Green = value
+        local color = Color3.fromRGB(ColorPickerFrame.Red or 255, value, ColorPickerFrame.Blue or 255)
+        Preview.BackgroundColor3 = color
+        callback(color)
+    end)
+    ColorSliderG.Position = UDim2.new(0, 0, 0, 100)
+    ColorPickerFrame.Green = 255
+
+    local ColorSliderB = CreateSlider(ColorPickerFrame, "Blue", 0, 255, function(value)
+        ColorPickerFrame.Blue = value
+        local color = Color3.fromRGB(ColorPickerFrame.Red or 255, ColorPickerFrame.Green or 255, value)
+        Preview.BackgroundColor3 = color
+        callback(color)
+    end)
+    ColorSliderB.Position = UDim2.new(0, 0, 0, 160)
+    ColorPickerFrame.Blue = 255
+
+    return ColorPickerFrame
+end
+
+-- Логика ключа
+KeySubmit.MouseButton1Click:Connect(function()
+    if IsValidKey(KeyTextBox.Text) then
+        KeyFrame.Visible = false
+        MainFrame.Visible = true
+        ToggleButton.Visible = true
+        print("Key accepted!")
+    else
+        KeyTextBox.Text = "Invalid Key"
+        wait(1)
+        KeyTextBox.Text = ""
+    end
+end)
+
+KeyCopy.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(COPY_LINK)
+        KeyCopy.Text = "Copied!"
+        wait(1)
+        KeyCopy.Text = "Copy Link"
+    else
+        print("Clipboard not supported")
+    end
+end)
+
+-- Создаем вкладки
+local MainTab = CreateTab("Main")
+local PlayerTab = CreateTab("Misc")
+local PremTab = CreateTab("Premium")
+local SettingsTab = CreateTab("Settings")
+
+-- Добавляем элементы в MainTab
+CreateButton(MainTab, "Enable Speed Hack", function()
+    print("Speed Hack Enabled!")
+end)
+
+CreateToggle(MainTab, "Infinite Jump", function(state)
+local function InfiniteJump()
+    local Players = game:GetService("Players")
+    local plr = Players.LocalPlayer
+    local UserInputService = game:GetService("UserInputService")
+
+    UserInputService.JumpRequest:Connect(function()
+        local character = plr.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end
+    end)
+end
+
+-- Вызов функции
+InfiniteJump()
+end)
+
+CreateSlider(PlayerTab, "Walk Speed", 16, 100, function(value)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+end)
+
+CreateTextBox(PlayerTab, "Custom Value", function(text)
+    print("haha")
+end)
+
+-- Добавляем элементы в SettingsTab
+
+CreateButton(SettingsTab, "Save Config", function()
+    local config = {
+        WalkSpeed = 16,
+        JumpEnabled = false,
+        Theme = "Dark",
+        Color = {R = 255, G = 255, B = 255}
+    }
+    DataStoreService:GetDataStore("ROBANIKCheatConfig"):SetAsync(LocalPlayer.UserId, config)
+    print("Config saved!")
+end)
+
+CreateButton(SettingsTab, "Load Config", function()
+    local config = DataStoreService:GetDataStore("ROBANIKCheatConfig"):GetAsync(LocalPlayer.UserId)
+    if config then
+        print("Config loaded:", config)
+    end
+end)
+
+-- Устанавливаем MainTab как активную по умолчанию
+Tabs[1].Content.Visible = true
+CurrentTab = Tabs[1].Content
+TweenService:Create(Tabs[1].Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 70)}):Play()
