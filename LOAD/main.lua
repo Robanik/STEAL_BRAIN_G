@@ -691,8 +691,10 @@ end
 
 -- Обновление FOV-кружка
 local function UpdateCircle()
+    -- Получаем точный центр экрана
+    local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    Circle.Position = ScreenCenter -- Устанавливаем кружок в центр экрана
     Circle.Radius = FOV
-    Circle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2) -- Центр экрана
     Circle.Visible = AimbotEnabled
 end
 
@@ -715,6 +717,16 @@ RunService.RenderStepped:Connect(function()
         if Target then
             AimAt(Target)
         end
+    end
+end)
+
+-- Дополнительная проверка для дебага
+spawn(function()
+    while true do
+        local ScreenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+        print("Screen Center:", ScreenCenter.X, ScreenCenter.Y) -- Для отладки
+        print("Circle Position:", Circle.Position.X, Circle.Position.Y) -- Проверяем позицию кружка
+        wait(1)
     end
 end)
 
