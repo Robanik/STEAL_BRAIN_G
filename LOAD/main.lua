@@ -438,13 +438,37 @@ end)
 
 --=================================--
 
+-- Infinite WalkSpeed Slider
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Slider setup
+CreateSlider(MainTab, "Walk Speed", 16, 100, function(value)
+    -- Store the desired WalkSpeed value
+    LocalPlayer:SetAttribute("WalkSpeedValue", value)
+    print("Walk Speed set to:", value)
+end)
+
+-- Heartbeat loop to constantly apply WalkSpeed
+RunService.Heartbeat:Connect(function()
+    local character = LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            local speed = LocalPlayer:GetAttribute("WalkSpeedValue") or 16
+            humanoid.WalkSpeed = speed
+        end
+    end
+end)
+
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local infiniteJumpEnabled = false
 local isJumpHeld = false
-local jumpCooldown = 1.0 -- Time between auto-jumps (in seconds)
+local jumpCooldown = 0.4 -- Time between auto-jumps (in seconds)
 local lastJumpTime = 0
 
 -- Toggle setup (assuming CreateToggle is defined elsewhere)
