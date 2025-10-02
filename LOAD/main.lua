@@ -414,7 +414,7 @@ KeyCopy.MouseButton1Click:Connect(function()
 end)
 
 -- Create Tabs
-local MainTab = CreateTab("Main")
+local MainTab = CreateTab("CREDIT")
 local EspTab = CreateTab("Esp")
 local PlayerTab = CreateTab("Player")
 local GameTab = CreateTab("Game")
@@ -424,10 +424,16 @@ local SettingsTab = CreateTab("Settings")
 CreateButton(MainTab, "HELLO", function()
 end)
 
-CreateButton(MainTab, "THANKS FOR USING", function()
+CreateButton(MainTab, "CREDIT:", function()
 end)
 
-CreateButton(MainTab, "ROBANIK SCRIPT", function()
+CreateButton(MainTab, "ROBANIK", function()
+end)
+
+CreateButton(MainTab, "AND", function()
+end)
+
+CreateButton(MainTab, "VAYRIX", function()
 end)
 
 --=================================--
@@ -437,30 +443,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G
 end)
 
 --=================================--
-
--- Infinite WalkSpeed Slider
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-
--- Slider setup
-CreateSlider(MainTab, "Walk Speed", 16, 100, function(value)
-    -- Store the desired WalkSpeed value
-    LocalPlayer:SetAttribute("WalkSpeedValue", value)
-    print("Walk Speed set to:", value)
-end)
-
--- Heartbeat loop to constantly apply WalkSpeed
-RunService.Heartbeat:Connect(function()
-    local character = LocalPlayer.Character
-    if character then
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            local speed = LocalPlayer:GetAttribute("WalkSpeedValue") or 16
-            humanoid.WalkSpeed = speed
-        end
-    end
-end)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -524,11 +506,6 @@ end)
 CreateButton(GameTab, "Afk", function()
 
 end)
-
-CreateButton(GameTab, "Off Afk", function()
-
-end)
-
 --=================================--
 
 CreateButton(SettingsTab, "Save Config", function()
