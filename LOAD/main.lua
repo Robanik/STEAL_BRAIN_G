@@ -504,7 +504,7 @@ end)
 --=================================--
 
 CreateButton(GameTab, "Afk", function()
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G/refs/heads/main/LOAD/Assets/Afk_zone.lua"))()
 end)
 --=================================--
 
