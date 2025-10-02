@@ -444,61 +444,8 @@ end)
 
 --=================================--
 
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-local infiniteJumpEnabled = false
-local isJumpHeld = false
-local jumpCooldown = 0.4 -- Time between auto-jumps (in seconds)
-local lastJumpTime = 0
-
--- Toggle setup (assuming CreateToggle is defined elsewhere)
-CreateToggle(PlayerTab, "Infinite Jump", function(state)
-    infiniteJumpEnabled = state
-end)
-
--- Track jump input start
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Space then
-        isJumpHeld = true
-    elseif not gameProcessedEvent and input.UserInputType == Enum.UserInputType.Touch then
-        -- Detect mobile jump button (assuming standard Roblox mobile controls)
-        isJumpHeld = true
-    end
-end)
-
--- Track jump input end
-UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Space then
-        isJumpHeld = false
-    elseif not gameProcessedEvent and input.UserInputType == Enum.UserInputType.Touch then
-        isJumpHeld = false
-    end
-end)
-
--- Auto-jump loop
-RunService.Heartbeat:Connect(function(deltaTime)
-    if infiniteJumpEnabled and isJumpHeld then
-        local currentTime = tick()
-        if currentTime - lastJumpTime >= jumpCooldown then
-            local character = LocalPlayer.Character
-            if character then
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                local hrp = character:FindFirstChild("HumanoidRootPart")
-                if humanoid and humanoid.Health > 0 and hrp then
-                    -- Trigger jump
-                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                    -- Apply forward movement based on player's input direction
-                    local moveDir = humanoid.MoveDirection
-                    if moveDir.Magnitude > 0 then
-                        hrp.Velocity = Vector3.new(moveDir.X * 16, hrp.Velocity.Y, moveDir.Z * 16)
-                    end
-                    lastJumpTime = currentTime
-                end
-            end
-        end
-    end
+CreateButton(PlayerTab, "inf jump (button)", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G/refs/heads/main/LOAD/Assets/NEW_INFI_J.lua"))()
 end)
 
 --=================================--
