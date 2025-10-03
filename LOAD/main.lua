@@ -452,67 +452,63 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local LocalPlayer = Players.LocalPlayer
-local BaseSpeed = 16 -- Базовая скорость (стандартная в Roblox)
-local ValueSpeed = 16 -- Начальное значение слайдера
-local ActiveCFrameSpeedBoost = true -- Автоматически включено
+local BaseSpeed = 16
+local ValueSpeed = 16
+local ActiveCFrameSpeedBoost = true
 local cframeSpeedConnection = nil
 
--- Функция для обновления скорости с CFrame Speed Boost
-local function updateCFrameSpeed(character)
-    if cframeSpeedConnection then
-        cframeSpeedConnection:Disconnect()
-        cframeSpeedConnection = nil
-    end
+local function startCFrameSpeed(character)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not humanoid or not hrp then return end
 
-    if ActiveCFrameSpeedBoost then
-        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    -- Always keep WalkSpeed updated
+    humanoid.WalkSpeed = ValueSpeed
 
-        if humanoid then
-            humanoid.WalkSpeed = ValueSpeed -- Устанавливаем скорость ходьбы
-        end
-
+    -- Only connect once
+    if not cframeSpeedConnection then
         cframeSpeedConnection = RunService.RenderStepped:Connect(function()
-            if character and humanoid and hrp then
-                local moveDir = humanoid.MoveDirection
-                if moveDir.Magnitude > 0 then
-                    -- Масштабируем CFrame Speed относительно базовой скорости
-                    local speedMultiplier = math.max(ValueSpeed / BaseSpeed, 1)
-                    hrp.CFrame = hrp.CFrame + moveDir * speedMultiplier * 0.080
-                end
+            if not character.Parent then return end
+
+            -- Update WalkSpeed every frame to make sure it sticks
+            humanoid.WalkSpeed = ValueSpeed
+
+            -- Extra CFrame movement (speed boost)
+            local moveDir = humanoid.MoveDirection
+            if moveDir.Magnitude > 0 then
+                local speedMultiplier = math.max(ValueSpeed / BaseSpeed, 1)
+                hrp.CFrame = hrp.CFrame + moveDir * speedMultiplier * 0.08
             end
         end)
     end
 end
 
--- Обработчик появления персонажа
-local function onCharacterAdded(character)
-    updateCFrameSpeed(character)
-end
-
--- Обработчик удаления персонажа
-local function onCharacterRemoving()
+-- Character events
+LocalPlayer.CharacterAdded:Connect(startCFrameSpeed)
+LocalPlayer.CharacterRemoving:Connect(function()
     if cframeSpeedConnection then
         cframeSpeedConnection:Disconnect()
         cframeSpeedConnection = nil
     end
-end
+end)
 
--- Подключение событий
-LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
-LocalPlayer.CharacterRemoving:Connect(onCharacterRemoving)
-
--- Проверка, если персонаж уже существует
+-- If character exists on script start
 if LocalPlayer.Character then
-    onCharacterAdded(LocalPlayer.Character)
+    startCFrameSpeed(LocalPlayer.Character)
 end
 
--- Слайдер для управления скоростью
-CreateSlider(PlayerTab, "Walk Speed", 16, 150, function(value)
-    ValueSpeed = value -- Обновляем значение скорости
+-- Slider
+CreateSlider(MainTab, "Walk Speed", 16, 150, function(value)
+    ValueSpeed = value
     print("Walk Speed set to:", value)
-    if LocalPlayer.Character then
-        updateCFrameSpeed(LocalPlayer.Character) -- Обновляем CFrame Speed при изменении слайдера
+
+    -- Immediately update WalkSpeed on slider change
+    local character = LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = ValueSpeed
+        end
     end
 end)
 
