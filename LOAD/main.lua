@@ -498,7 +498,7 @@ if LocalPlayer.Character then
 end
 
 -- Slider
-CreateSlider(MainTab, "Walk Speed", 16, 150, function(value)
+CreateSlider(PlayerTab, "Walk Speed", 16, 150, function(value)
     ValueSpeed = value
     print("Walk Speed set to:", value)
 
