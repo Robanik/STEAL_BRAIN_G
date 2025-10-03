@@ -5,9 +5,7 @@ local DataStoreService = game:GetService("DataStoreService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G/refs/heads/main/LOAD/Assets/SPEEDWALK.lua"))()
-
--- Settings
+--settings
 local KEY_SYSTEM_ENABLED = true
 local COPY_LINK = "https://discord.gg/3mVUh2RWsp"
 
@@ -451,7 +449,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G
 end)
 
 -- Слайдер для управления скоростью
-CreateSlider(MainTab, "Walk Speed", 16, 150, function(value)
+CreateSlider(PlayerTab, "Walk Speed", 16, 150, function(value)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Robanik/STEAL_BRAIN_G/refs/heads/main/LOAD/Assets/SPEEDWALK.lua"))()
     ValueSpeed = value -- Обновляем значение скорости
     print("Walk Speed set to:", value)
     if LocalPlayer.Character then
